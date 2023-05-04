@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <title>Pace Bend DWS</title>
+    <style type="text/css">
+      body {
+        font-family: arial;
+        font-size: .8em;
+        color: #000000;
+        background:#ffffff;
+      }
+      #map {
+        border: thin solid #cccccc;
+      }
+      .grey {
+        color:#666666;
+      }
+      a {
+        font-family: arial;
+        text-decoration: none;
+        color: #FF0000
+      }
+      #map {
+        height: 480px;
+        width: 100%;
+       }
+    </style>
+  </head>
+  <body>
+ 
+    <div id="head" style="width: 400px;">
+      <div><b>current lake level: <span id="level">000.00</span></b></div>
+    <span class="grey">a basic guide to climbing over water in the briar cliff &amp; pace bend area of lake travis. climb and swim at your own risk. there are rocks and hazards underneath the water and some problems are more dangerous than others. always check your landings. we'll be updating this with pictures and more accurate data.</span><br/><br/>
+    <table cellpadding="10" cellspacing="0" border="0">
+      <tr valign="center">
+        <td><img src="https://labs.google.com/ridefinder/images/mm_20_red.png" border="0" alt="red"></td>
+        <td>too dangerous to climb</td>
+        <td>&nbsp;</td>
+        <td><img src="https://labs.google.com/ridefinder/images/mm_20_green.png" border="0" alt="green"></td>
+                          <td>reasonably safe</td>
+      </tr>
+      <tr valign="center">
+                          <td><img src="https://labs.google.com/ridefinder/images/mm_20_yellow.png" border="0" alt="yellow"></td>
+                          <td>climbable but kinda sketchy</td>
+        <td>&nbsp;</td>
+        <td><img src="https://labs.google.com/ridefinder/images/mm_20_gray.png" border="0" alt="gray"></td>
+                          <td>under water</td>
+                  </tr>
+    </table><br/>
+    </div>
+    <div id="map"></div>
+    <span>Water level data sourced from <a href="https://www.waterdatafortexas.org/reservoirs/recent-conditions.json" target="_blank">here</a></span>
+    <span> Based on the original site <a href="http://bloodyflapper.com/pacebend/">Bloodyflapper</a></span>
+    <br/>
+    <br/>    
+    <script>
+      let iconGreen = "https://labs.google.com/ridefinder/images/mm_20_green.png";
+      let iconYellow = "https://labs.google.com/ridefinder/images/mm_20_yellow.png";
+      let iconRed = "https://labs.google.com/ridefinder/images/mm_20_red.png";
+      let iconGray = "https://labs.google.com/ridefinder/images/mm_20_gray.png";
+
+      let coves = [
+        {
+          name: "Marshall",
+          lat: 30.444739,
+          lng: -98.038101,
+          minLevel: 680,
+          safeLevel: 682,
+          maxLevel: 696,
+          desc:
+            "orange overhang with bolts south of the cove.large ledge and slab at the bottom. lots of plants<br />at the top out.",
+        },
+        {
+          name: "Baldwin",
+          lat: 30.444451,
+          lng: -98.019777,
+          minLevel: 658,
+          safeLevel: 662,
+          maxLevel: 672,
+          desc:
+            "low water grey wall with small roof just north of<br />the cove. bullet headwall.",
+        },
+        {
+          name: "Thurman",
+          lat: 30.449555,
+          lng: -98.034431,
+          minLevel: 670,
+          safeLevel: 675,
+          maxLevel: 696,
+          desc:
+            "yellowish wall on the south side of the cove is a<br />little chossy but climbable. north side of the<br />cove has two or thee good climbs with bolts. a<br />little further north there is a small boulder for<br />warming up",
+        },
+        {
+          name: "Briarcliff",
+          lat: 30.412567,
+          lng: -98.044726,
+          minLevel: 679,
+          safeLevel: 682,
+          maxLevel: 700,
+          desc:
+            "giant bullet grey tufa and stalactite covered<br />scoop at the back of the cove near the briarcliff<br />marina",
+        },
+        {
+          name: "Gracie",
+          lat: 30.454795,
+          lng: -98.031662,
+          minLevel: 670,
+          safeLevel: 674,
+          maxLevel: 688,
+          desc:
+            "dark grey, orange, and brown godstone wall north<br />of the cove half way to davis cove. large slab at<br />the base of the cliff.",
+        },
+        {
+          name: "Maugham",
+          lat: 30.462453,
+          lng: -98.027644,
+          minLevel: 672,
+          safeLevel: 674,
+          maxLevel: 686,
+          desc:
+            "big jug covered grotto inside the cove on the<br />south side with a large ledge under it",
+        },
+        {
+          name: "North Maugham",
+          lat: 30.464344,
+          lng: -98.027362,
+          minLevel: 668,
+          safeLevel: 670,
+          maxLevel: 685,
+          desc:
+            "white wall north of the cove with a dark grey<br />bullet head wall. there's a pile of rocks under<br />the left side of the cave and one to the right of<br />the wall.",
+        },
+        {
+          name: "Giles",
+          lat: 30.450283,
+          lng: -98.016845,
+          minLevel: 650,
+          safeLevel: 655,
+          maxLevel: 672,
+          desc: "large white virt dihedral leading to big<br />multi-tiered roof",
+        },
+        {
+          name: "Greyskull",
+          lat: 30.481978,
+          lng: -98.022562,
+          minLevel: 666,
+          safeLevel: 670,
+          maxLevel: 681,
+          desc:
+            "white tufa covered walls on the lago vista side of<br />the lake. top out into a lot of plantlife. weird<br />ecosystem",
+        },
+        {
+          name: "Thrasher",
+          lat: 30.442564,
+          lng: -98.039585,
+          minLevel: 683,
+          safeLevel: 685,
+          maxLevel: 693,
+          desc: "bullet hard orange overhang inside the cove on the<br />north side",
+        },
+      ];
+
+      async function initMap() {
+        let map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 12,
+          center: { lat: 30.44749, lng: -98.028603 },
+        });
+
+        let curLevel = await fetch("https://data.pbdws.workers.dev/")
+          .then(response => response.json())
+          .then(data => data.Travis.elevation);
+
+        document.getElementById('level').innerText = curLevel;
+
+        for (var i = coves.length - 1; i >= 0; i--) {
+          let cove = coves[i];
+          let icon;
+
+          // Conditionally set the marker color based on safe climbing levels
+          if (curLevel < cove.minLevel) {
+            icon = iconRed;
+          } else if (curLevel >= cove.minLevel && curLevel <= cove.safeLevel) {
+            icon = iconYellow;
+          } else if (curLevel >= cove.safeLevel && curLevel <= cove.maxLevel) {
+            icon = iconGreen;
+          } else if (curLevel > cove.maxLevel) {
+            icon = iconGray;
+          }
+
+          let marker = new google.maps.Marker({
+            position: { lat: cove.lat, lng: cove.lng },
+            map: map,
+            title: cove.name,
+            icon: icon,
+          });
+          let tpl = `<br /><b>${cove.name}</b><font color=#666666> - gps: ${cove.lat} x ${cove.lng}</font><br />${cove.desc}<br /><br />minimum level: ${cove.minLevel}<br />safe level: ${cove.safeLevel}<br />maximum level: ${cove.maxLevel}<br /><br />`;
+          let info = new google.maps.InfoWindow({ content: tpl });
+          marker.addListener("click", () => {
+            info.open(map, marker);
+          });
+        }
+      }
+
+    </script>
+    <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhKR8bAhtK9CtOlIjsa6tJvXa8TQrxXQE&amp;callback=initMap">
+    </script>
+  </body>
+</html>
